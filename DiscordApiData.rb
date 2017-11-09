@@ -1,12 +1,11 @@
 require 'discordrb'
-require 'discordrb'
 require 'configatron'
 require_relative 'config.rb'
 
-class ApiData
+class DiscordApiData
 
 	# アクセサ
-	attr_reader :bot, :botID, :serverID, :textChannelID, :voiceChannelID, :userID
+	attr_reader :bot, :botID, :serverID, :textChannelID, :voiceChannelID, :userID, :musicBotID
 
 	def initialize
 		@botToken = configatron.token
@@ -30,6 +29,9 @@ class ApiData
 
 		# User ID
 		@userID = 249901088310820865
+
+		# Music Bot ID
+		@musicBotID = 353815296190054400
 	end
 
 end
