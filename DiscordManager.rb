@@ -21,12 +21,12 @@ class DiscordManager
 		@server = @bot.server(@serverID)
 		@textChannel = @bot.channel(@textChannelID)
 		@voiceChannel = @bot.channel(@voiceChannelID)
-		@user = @bot.user(@userID)
+		# @user = @bot.user(@userID)
 		@member = @bot.member(@serverID, @userID)
 		@musicBotMember = @bot.member(@serverID, @musicBotID)
 
 		# BotをVoice Channelへ接続
-		@bot.voice_connect(@voiceChannel)
+		@voiceBot = @bot.voice_connect(@voiceChannel)
 	end
 
 	# SendMesseage: キーボードから入力したメッセージをDiscordに投稿
@@ -40,30 +40,46 @@ class DiscordManager
 	end
 
 	# sendMessageFromParam
-	def sendMessageFromParam(message)
+	# @param [string] message 送信するメッセージ
+	def sendMessageFromParam message
 		# @param [int] channel.id Discord channelのID
 		# @param [string] message 送信するメッセージ
 		@bot.send_message(@textChannelID, message)
 	end
 
-	# userMicMute: ユーザのマイクをミュートにする
-	def userMicMute
+	# muteUserMic: ユーザのマイクをミュートにする
+	def muteUserMic
 		@member.server_mute
 	end
 
-	# userMicUnMute: ユーザのマイクのミュートを解除する
-	def userMicUnMute
+	# unMuteUserMic: ユーザのマイクのミュートを解除する
+	def unMuteUserMic
 		@member.server_unmute
 	end
 
 	# botMicMute: botのマイクをミュートにする
-	def botMicMute
+	def muteBotMic
 		@musicBotMember.server_mute
 	end
 
 	# botMicUnMute: botのマイクのミュートを解除する
-	def botMicUnMute
+	def unMuteBotMic
 		@musicBotMember.server_unmute
+	end
+
+	# playMusic: botから音楽を再生する
+	def playMusic
+		@voiceBot.play_file 'data/music.mp3'
+	end
+
+	# stopMusic: botが再生している音楽を停止させる
+	def stopMusic
+		@voiceBot.stop_playing
+	end
+
+	# adJustBotVolume: botが再生している音楽の音量を変更
+	def adJustBotVolume value
+		@voiceBot.filter_volume value
 	end
 
 end

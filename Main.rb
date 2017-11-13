@@ -12,6 +12,7 @@ controler = DiscordManager.new(discordData)
 # message
 playMessage = "!play 芝浦工業大学校歌"
 message0 = "こんにちは"
+message1 = "aaa"
 
 
 # 無限ループ
@@ -23,18 +24,26 @@ loop do
 	if (isUpdate)
 		# ユーザーサーバーミュート
 		if (arduino.isMuteUser)
-			controler.userMicMute
+			controler.muteUserMic
 		end
 		if (!arduino.isMuteUser)
-			controler.userMicUnMute
+			controler.unMuteUserMic
 		end
 
 		# 音楽ボットミュート
 		if (arduino.isMuteMusicBot)
-			controler.botMicMute
+			controler.muteBotMic
 		end
 		if (!arduino.isMuteMusicBot)
-			controler.botMicUnMute
+			controler.unMuteBotMic
+		end
+
+		# 保留
+		if (arduino.isOnHold)
+			controler.playMusic
+		end
+		if (!arduino.isOnHold)
+			controler.stopMusic
 		end
 
 		# 音楽ボット再生
@@ -49,14 +58,23 @@ loop do
 			arduino.isSendMessage0 = false
 		end
 
-
 		# message1の送信
-
-		# 保留
+		if (arduino.isSendMessage1)
+			controler.sendMessageFromParam message1
+			arduino.isSendMessage1 = false
+		end
 
 		# 保留音量調節
+		if (arduino.isChangeVolume)
+			controler.adjustBotVolume controler.volumeValue
+			arduino.isChangeVolume = false
+		end
 
 		# マイクによる自動ミュート
+		if (arduino.isMicOverThreshold)
+			controler.muteUserMic
+			arduino.isMicOverThreshold = false
+		end
 	end
 
 end

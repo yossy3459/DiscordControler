@@ -5,13 +5,14 @@ class ArduinoManager
 
 	# アクセサ
 	# get
-	attr_reader :isMuteUser, :isMuteMusicBot, :isOnHold, :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :volumeInput, :micInput
+	attr_reader :isMuteUser, :isMuteMusicBot, :isOnHold, :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :isChangeVolume, :volumeInput, :isMicOverThreshold
 	# set
-	attr_writer :isMuteUser, :isMuteMusicBot, :isOnHold, :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :volumeInput, :micInput
+	attr_writer :isMuteUser, :isMuteMusicBot, :isOnHold, :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :isChangeVolume, :volumeInput, :isMicOverThreshold
 
 	def initialize()
 		# バッファ (String型で初期化)
-		@buf = String.new
+		@pin = String.new
+		@value = String.new
 
 		# データ
 		# スイッチ (状態保持)
@@ -25,10 +26,11 @@ class ArduinoManager
 		@isSendMessage1 = false  # メッセージ1
 
 		# 可変抵抗 (int [0 19])
-		@volumeInput = 0
+		@isChangeVolume = false
+		@volumeValue = 0
 
 		# マイク
-		@micOverThreshold = true
+		@isMicOverThreshold = false
 
 		# シリアルポートオープン
 		@serial_port = "/dev/cu.usbmodem1411"
@@ -41,29 +43,39 @@ class ArduinoManager
 		isUpdate = true
 
 		# シリアル値読み取り
-		@buf = @sp.gets
+		@pin = @sp.gets
+		@value = @sp.gets
 		# puts("Arduino: " + @buf.chomp)
 
 		# 読み取ったシリアル値に応じて属性を変更
-		case @buf.chomp
-		when "sw2: 0"
-			@isMuteUser = false
-			puts("isMuteUser: false")
-		when "sw2: 1"
-			@isMuteUser = true
-			puts("isMuteUser: true")
-		when "sw3: 0"
-			@isMuteMusicBot = false
-			puts("isMuteMusicBot: false")
-		when "sw3: 1"
-			@isMuteMusicBot = true
-			puts("isMuteMusicBot: true")
-		when "sw4: 0"
-			@isOnHold = false
-			puts("isOnHold: false")
-		when "sw4: 1"
-			@isOnHold = true
-			puts("isOnHold: true")
+		case @pin.chomp
+		when "sw2"
+			if (value == 0)
+				@isMuteUser = false
+				puts("isMuteUser: false")
+			end
+			if (value == 1)
+				@isMuteUser = true
+				puts("isMuteUser: true")
+			end
+		when "sw3"
+			if (value == 0)
+				@isMuteMusicBot = false
+				puts("isMuteMusicBot: false")
+			end
+			if (value == 1)
+				@isMuteMusicBot = true
+				puts("isMuteMusicBot: true")
+			end
+		when "sw4"
+			if (value == 0)
+				@isOnHold = false
+				puts("isOnHold: false")
+			end
+			if (value == 1)
+				@isOnHold = true
+				puts("isOnHold: true")
+			end
 		when "sw5"
 			@isPlayMusicBot = true
 			puts("isPlayMusicBot")
@@ -73,6 +85,13 @@ class ArduinoManager
 		when "sw7"
 			@isSendMessage1 = true
 			puts("isSendMessage1")
+		when "vol"
+			@isChangeVolume = true
+			@volumeValue = value
+			puts("isChangeVolume")
+		when "mic"
+			@isMicOverThreshold = true
+			puts("isMicOverThreshold")
 		else
 			isUpdate = false
 		end
