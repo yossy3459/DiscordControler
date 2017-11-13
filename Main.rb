@@ -10,9 +10,11 @@ arduino = ArduinoManager.new
 controler = DiscordManager.new(discordData)
 
 # message
+autoMuteMessage = "周囲で大きな音が発生したため、ユーザのマイクをミュートします！"
 playMessage = "!play 芝浦工業大学校歌"
 message0 = "こんにちは"
-message1 = "aaa"
+message1 = "お疲れ様でした！"
+
 
 
 # 無限ループ
@@ -66,12 +68,13 @@ loop do
 
 		# 保留音量調節
 		if (arduino.isChangeVolume)
-			controler.adjustBotVolume controler.volumeValue
+			controler.adjustBotVolume arduino.volumeValue
 			arduino.isChangeVolume = false
 		end
 
 		# マイクによる自動ミュート
 		if (arduino.isMicOverThreshold)
+			controler.sendMessageFromParam autoMuteMessage
 			controler.muteUserMic
 			arduino.isMicOverThreshold = false
 		end

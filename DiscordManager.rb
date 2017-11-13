@@ -27,6 +27,7 @@ class DiscordManager
 
 		# BotをVoice Channelへ接続
 		@voiceBot = @bot.voice_connect(@voiceChannel)
+		@voiceBot.filter_volume = 0
 	end
 
 	# SendMesseage: キーボードから入力したメッセージをDiscordに投稿
@@ -39,7 +40,7 @@ class DiscordManager
 		@bot.send_message(@textChannelID, message)
 	end
 
-	# sendMessageFromParam
+	# sendMessageFromParam: 引数に指定したメッセージをDiscordに投稿
 	# @param [string] message 送信するメッセージ
 	def sendMessageFromParam message
 		# @param [int] channel.id Discord channelのID
@@ -67,19 +68,29 @@ class DiscordManager
 		@musicBotMember.server_unmute
 	end
 
+	# adjustBotVolume: botが再生している音楽の音量を変更
+	def adjustBotVolume value
+		@voiceBot.filter_volume = value
+	end
+
 	# playMusic: botから音楽を再生する
 	def playMusic
-		@voiceBot.play_file 'data/music.mp3'
+		sendMessageFromParam "♪♪♪♪♪ 保留中 ♪♪♪♪♪"
+		@playingThread = Thread.start do
+			begin
+				loop do
+					@voiceBot.play_file './music/HoldOn.mp3'
+				end
+			ensure
+				sendMessageFromParam "保留解除"
+			end
+		end
 	end
 
 	# stopMusic: botが再生している音楽を停止させる
 	def stopMusic
 		@voiceBot.stop_playing
-	end
-
-	# adJustBotVolume: botが再生している音楽の音量を変更
-	def adJustBotVolume value
-		@voiceBot.filter_volume value
+		Thread::list.each { |t| Thread::kill(t) if t != Thread::current }
 	end
 
 end
