@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'SerialPort'
-require "./SerialPortData"
 
 class ArduinoManager
 
@@ -8,9 +7,9 @@ class ArduinoManager
 	# get
 	attr_reader :isMuteUser, :isMuteMusicBot, :isOnHold, :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :isChangeVolume, :volumeValue, :isMicOverThreshold
 	# set
-	attr_writer :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :isChangeVolume, :volumeValue, :isMicOverThreshold
+	attr_writer :isMuteUser, :isMuteMusicBot, :isOnHold, :isPlayMusicBot, :isSendMessage0, :isSendMessage1, :isChangeVolume, :volumeValue, :isMicOverThreshold
 
-	def initialize
+	def initialize()
 		# データ
 		# スイッチ (状態保持)
 		@isMuteUser = false  # ユーザサーバーミュート
@@ -30,22 +29,21 @@ class ArduinoManager
 		@isMicOverThreshold = false
 
 		# シリアルポートオープン
-		@serial = SerialPortData.new
-		@sp = SerialPort.new @serial.serialPort, @serial.serialBps
+		@serial_port = "/dev/cu.usbmodem1421"
+		@serial_bps = 9600
+		@sp = SerialPort.new(@serial_port, @serial_bps)
 	end
 
-	# getSerialValue: Arduinoからのシリアル地を読み取り、各種フラグを変更する
 	def getSerialValue
 		# 更新するかどうか
 		isUpdate = true
 
-		# シリアル値読み取り (pin)
+		# シリアル値読み取り
 		@pin = @sp.gets
 
-		# デバッグ用
+		# デバッグ
 		puts "Arduino: " + @pin.chomp
 
-		# シリアル値読み取り (value)
 		case @pin.chomp
 		when "sw2", "sw3", "sw4", "vol"
 			@value = @sp.gets
@@ -57,61 +55,60 @@ class ArduinoManager
 			@value = @value.to_i
 		end
 
+
+
 		# 読み取ったシリアル値に応じて属性を変更
 		case @pin.chomp
 		when "sw2"
 			if @value == 0
 				@isMuteUser = false
-				puts "isMuteUser: false"
+				puts("isMuteUser: false")
 			end
 			if @value == 1
 				@isMuteUser = true
-				puts "isMuteUser: true"
+				puts("isMuteUser: true")
 			end
 		when "sw3"
 			if @value == 0
 				@isMuteMusicBot = false
-				puts "isMuteMusicBot: false"
+				puts("isMuteMusicBot: false")
 			end
 			if @value == 1
 				@isMuteMusicBot = true
-				puts "isMuteMusicBot: true"
+				puts("isMuteMusicBot: true")
 			end
 		when "sw4"
 			if @value == 0
 				@isOnHold = false
-				puts "isOnHold: false"
+				puts("isOnHold: false")
 			end
 			if @value == 1
 				@isOnHold = true
-				puts "isOnHold: true"
+				puts("isOnHold: true")
 			end
 		when "sw5"
 			@isPlayMusicBot = true
-			puts "isPlayMusicBot"
+			puts("isPlayMusicBot")
 		when "sw6"
 			@isSendMessage0 = true
-			puts "isSendMessage0"
+			puts("isSendMessage0")
 		when "sw7"
 			@isSendMessage1 = true
-			puts "isSendMessage1"
+			puts("isSendMessage1")
 		when "vol"
-			# 再生中は操作不可
 			if !@isOnHold
 				@isChangeVolume = true
 				@volumeValue = @value
-				puts "isChangeVolume"
+				puts("isChangeVolume")
 			end
 		when "mic"
 			@isMicOverThreshold = true
 			@isMuteUser = true
-			puts "isMicOverThreshold"
+			puts("isMicOverThreshold")
 		else
-			# Arduinoから入力がなかったら
 			isUpdate = false
 		end
 
-		# Mainでアップデートするかどうか
 		return isUpdate
 	end
 end

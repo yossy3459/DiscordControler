@@ -1,18 +1,22 @@
 require 'discordrb'
 require "./DiscordApiData"
 
+# DiscordManager: Discordを管理するクラス
 class DiscordManager
 
-	def initialize(data)
+	def initialize()
+		# データ読み込み
+		@data = DiscordApiData.new
+
 		# 属性初期化
-		@bot = data.bot
-		@botID = data.botID
-		@botToken = data.bot.token
-		@serverID = data.serverID
-		@textChannelID = data.textChannelID
-		@voiceChannelID = data.voiceChannelID
-		@userID = data.userID
-		@musicBotID = data.musicBotID
+		@bot = @data.bot
+		@botID = @data.botID
+		@botToken = @data.bot.token
+		@serverID = @data.serverID
+		@textChannelID = @data.textChannelID
+		@voiceChannelID = @data.voiceChannelID
+		@userID = @data.userID
+		@musicBotID = @data.musicBotID
 
 		# bot: 非同期で開始
 		@bot.run :async
@@ -27,7 +31,7 @@ class DiscordManager
 
 		# BotをVoice Channelへ接続
 		@voiceBot = @bot.voice_connect(@voiceChannel)
-		@voiceBot.filter_volume = 0
+		@voiceBot.filter_volume = 1
 	end
 
 	# SendMesseage: キーボードから入力したメッセージをDiscordに投稿
@@ -69,6 +73,7 @@ class DiscordManager
 	end
 
 	# adjustBotVolume: botが再生している音楽の音量を変更
+	# @param [int] value 音量の値
 	def adjustBotVolume value
 		@voiceBot.filter_volume = value
 	end
@@ -76,9 +81,11 @@ class DiscordManager
 	# playMusic: botから音楽を再生する
 	def playMusic
 		sendMessageFromParam "♪♪♪♪♪ 保留中 ♪♪♪♪♪"
+		# スレッド生成
 		@playingThread = Thread.start do
 			begin
 				loop do
+					# @param [string] filePass 音楽ファイルのパス
 					@voiceBot.play_file './music/HoldOn.mp3'
 				end
 			ensure
@@ -90,6 +97,8 @@ class DiscordManager
 	# stopMusic: botが再生している音楽を停止させる
 	def stopMusic
 		@voiceBot.stop_playing
+
+		# 現在のスレッド以外をkill
 		Thread::list.each { |t| Thread::kill(t) if t != Thread::current }
 	end
 

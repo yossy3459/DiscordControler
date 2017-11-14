@@ -2,6 +2,7 @@ require 'discordrb'
 require 'configatron'
 require_relative 'config.rb'
 
+# DiscordApiData: Discordのトークンや各種IDをストアするクラス
 class DiscordApiData
 
 	# アクセサ
