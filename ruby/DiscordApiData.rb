@@ -32,7 +32,7 @@ class DiscordApiData
 		@userID = 249901088310820865
 
 		# Music Bot ID
-		@musicBotID = 353815296190054400
+		@musicBotID = 380198711705206785
 	end
 
 end

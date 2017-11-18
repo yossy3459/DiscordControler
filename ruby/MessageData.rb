@@ -8,7 +8,7 @@ class MessageData
 		# message
 		@autoMuteMessage = "周囲で大きな音が発生したため、ユーザのマイクをミュートします！"
 		@playMessage = "!play 芝浦工業大学校歌"
-		@message0 = "こんにちは"
+		@message0 = "!pause"
 		@message1 = "お疲れ様でした！"
 	end
 

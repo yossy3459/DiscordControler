@@ -28,6 +28,7 @@ class DiscordManager
 		# @user = @bot.user(@userID)
 		@member = @bot.member(@serverID, @userID)
 		@musicBotMember = @bot.member(@serverID, @musicBotID)
+		@botMember = @bot.member(@serverID, @botID)
 
 		# BotをVoice Channelへ接続
 		@voiceBot = @bot.voice_connect(@voiceChannel)
@@ -65,11 +66,13 @@ class DiscordManager
 	# botMicMute: botのマイクをミュートにする
 	def muteBotMic
 		@musicBotMember.server_mute
+		#@botMember.server_mute
 	end
 
 	# botMicUnMute: botのマイクのミュートを解除する
 	def unMuteBotMic
 		@musicBotMember.server_unmute
+		#@botMember.server_unmute
 	end
 
 	# adjustBotVolume: botが再生している音楽の音量を変更
